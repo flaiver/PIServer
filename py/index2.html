@@ -1,0 +1,65 @@
+<HTML>
+<BODY>
+<script type="text/javascript">
+
+	function writeSongTitle(title, songListText, scriptListText)
+	{
+		var postFix = title.replace(/[^a-zA-Z0-9]/g,'_').trim();
+		var playSongFunction = "<script>\
+		function playSong"+postFix+"() {\
+			alert('Hello');\
+		}\
+		<\/script>";
+		
+		var stopSongFunction = "<script>function stopSong(){\
+			alert('world');\
+		}\
+       	<\/script>";
+		songListText += "<tr>";
+		songListText += "<th>" + title + "</th>";
+		songListText += playSongFunction;
+		songListText += stopSongFunction;
+		songListText += '<th><button onclick="playSong'+ postFix + '();">play</button></th>';
+
+		songListText += '<th><a href="#" onclick="stopSong();">stop<i/a></th>';
+songListText += "</tr>";
+		return [songListText, scriptListText];
+	}
+	
+	function createSongTable() 
+	{
+			alert("really");
+			var response = "myTestSong";
+			var songListString = "<table border=1>";
+			var scriptListString = "";
+			var songTitles = response.split('#');
+			for (var i = 0; i < songTitles.length; ++i)
+			{
+				listString = writeSongTitle(songTitles[i], songListString, scriptListString);
+				songListString = listString[0];
+				scriptListString = listString[1];
+		
+				break;
+			}
+			songListString += "</table>";
+			document.getElementById('songList').innerHTML = songListString;
+			
+
+			ele = document.getElementById('scriptPlace')
+			ele.innerHTML = scriptListString;
+			//document.write(songListString);
+
+			var codes = ele.getElementsByTagName("script");   
+			   for(var i=0;i<codes.length;i++)  
+			   {  
+				   alert(codes[i].text);
+					eval(codes[i].text);  
+			   }  
+			document.close();
+	}
+</script>
+<div id='scriptPlace'></div>
+<div id='songList'></div>
+<script>createSongTable();</script>
+</BODY>
+</HTML>
