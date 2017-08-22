@@ -102,9 +102,22 @@
 				xhr.send(params);
 			 };
 
+			var getMetaData = function()
+			{
+				// get full path
+				var xhrGetDir = new XMLHttpRequest();
+				xhrGetDir.open("POST", "", false);
+				var paramsGet = "command=getDirectory";
+				xhrGetDir.send(paramsGet);
+				var directory = xhrGetDir.responseText;
+				var fullpath = directory + "/" + songName;
+				report(fullpath);
+			}
+
 			var songNameCell = document.createElement('td');
 			var songNameTextNode = document.createTextNode(songName);
   			songNameCell.appendChild(songNameTextNode);
+			getMetaData();
 			
 			var playButtonCell = this.__createButton("Play", playSong);
 			var stopButtonCell = this.__createButton("Stop", stopSong);
