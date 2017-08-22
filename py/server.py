@@ -9,47 +9,29 @@ mixer.init()
 
 directory = '.'
 isLoading = False
+lastFileName = ""
 
-class Player(object):
-	def __init__(self, filename=""):
-		#self.filename = filename
-		#self.isInit = True
-		mixer.init()
-		print("mixer init")
+def getNextSongs(currentSong):
+	nextSongList = []
+	baseName = os.path.basename(currentSong)
+	currentDirectory = os.path.dirname(currentSong)
 
-	def getIsInit(self):
-		if self.isInit:
-			return True
-		return False
+	filesInDir = os.listdir(currentDirectory)
+	foundSong = False
+	for i, currentFile in enumerate(filesInDir):
+		if foundSong:
+			filename, extension = os.path.splitext(filesInDir[i])
+			if extension == ".mp3" or extension== ".MP3":
+				nextSongList.append(os.path.join(currentDirectory, filesInDir[i]))
+		else:
+			if os.path.basename(currentFile) == baseName:
+				foundSong = True
+				if len(filesInDir) == i + 1:
+					return []
 
-	def setFilename(self, filename):
-
-		mixer.music.load(filename)
-		"""
-		if not os.path.exists(filename):
-			self.isInit = False
-			raise IOError("%s doesn't exist - abort" % (filename))
-
-		self.filename = filename
-		self.isInit = True
-		print("load %s" % self.filename)
-		"""
+	return nextSongList
 	
-	def play(self):
-		"""
-		if not self.isInit:
-			raise ValueError("Player is not initialize can't play song")
-		print("playing song %s" % self.filename)
-		print("is init? %d" % self.isInit)
-		"""
-		mixer.music.play()
-		print("should play music")
-	
-	def stop(self):
-		mixer.music.stop()
 
-
-player = Player()
 #This class will handles any incoming request from
 #the browser 
 class MyHandler(BaseHTTPRequestHandler):
@@ -70,10 +52,9 @@ class MyHandler(BaseHTTPRequestHandler):
 
 	def do_POST(self):
 		global directory
-		global player
 		global isLoading
+		global lastFileName
 
-		print ("is busy %d " % mixer.get_busy())
 		if not mixer.get_init():
 			mixer.init()
 		
@@ -97,7 +78,7 @@ class MyHandler(BaseHTTPRequestHandler):
 				mixer.stop()			
 			mixer.music.play()
 			time.sleep(1)
-			print ("audio")
+
 		elif command == "pause":
 			mixer.music.pause()
 			return
@@ -106,7 +87,7 @@ class MyHandler(BaseHTTPRequestHandler):
 		elif command == "getSongList":
 			print("get files inside %s" % directory)
 			files =  os.listdir(directory)
-			files = [f for f in files if fnmatch.fnmatch(f, '*.mp3')]
+			files = [f for f in files if fnmatch.fnmatch(f, '*.mp3') or fnmatch.fnmatch(f, '*.MP3') ]
 			self.wfile.write("#".join(files))
 		elif command == "setSong":
 			print("set song function")
@@ -114,10 +95,18 @@ class MyHandler(BaseHTTPRequestHandler):
 			fileNameMatch = re.search("filename=(.+)+", post_data)
 			if fileNameMatch:
 				filename = fileNameMatch.group(1)
+				lastFileName = filename
 				print("set song %s" % filename)
-					
 				mixer.music.load(filename)
 				print("mixer loading finished")
+
+				print("clear the queue")
+				mixer.music.clear_queue()
+				nextSongList = getNextSongs(filename)
+
+				for nextSong in nextSongList:
+					mixer.music.queue(nextSong)
+					print("queueing %s" % nextSong)
 				
 		elif command == "setDirectory":
 			directoryMatch = re.search("directory=(.+)+", post_data)
