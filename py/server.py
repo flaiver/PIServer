@@ -4,12 +4,20 @@ import re
 import time
 from BaseHTTPServer import BaseHTTPRequestHandler
 from pygame import mixer
+import eyed3
 mixer.pre_init(44100, -16, 2, 512)
 mixer.init()
 
 directory = '.'
 isLoading = False
 lastFileName = ""
+
+def getMetaDataString(filepath):
+	metadata = eyed3.load(filepath)
+	title = metadata.tag.title
+	artist = metadata.tag.artist
+	duration = metadata.info.time_secs
+	return "#".join([title, artist, str(duration)])
 
 def getNextSongs(currentSong):
 	nextSongList = []
@@ -132,6 +140,12 @@ class MyHandler(BaseHTTPRequestHandler):
 			parentDir = os.path.abspath(os.path.join(directory, os.path.pardir))
 			directory = parentDir
 			print "new parent set"
+		elif command == "getMetaData":
+			filenameMatch = re.search("filename=(.+)+", post_data)
+			if filenameMatch:
+				filenamePath = filenameMatch.group(1)
+				metaData = getMetaDataString(filenamePath)
+				self.wfile.write(metaData)
 		else:
 			print("unknown command")
 
