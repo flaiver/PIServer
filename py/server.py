@@ -17,7 +17,7 @@ def getMetaDataString(filepath):
 	title = metadata.tag.title
 	artist = metadata.tag.artist
 	duration = metadata.info.time_secs
-	return "#".join([title, artist, str(duration)])
+	return "#%".join([title, artist, str(duration)])
 
 def getNextSongs(currentSong):
 	nextSongList = []
@@ -80,8 +80,6 @@ class MyHandler(BaseHTTPRequestHandler):
 		
 		command = commandMatch.group(1)
 		if command == "play":
-			print("play")
-
 			if mixer.get_busy():
 				mixer.stop()			
 			mixer.music.play()
@@ -96,7 +94,7 @@ class MyHandler(BaseHTTPRequestHandler):
 			print("get files inside %s" % directory)
 			files =  os.listdir(directory)
 			files = [f for f in files if fnmatch.fnmatch(f, '*.mp3') or fnmatch.fnmatch(f, '*.MP3') ]
-			self.wfile.write("#".join(files))
+			self.wfile.write("#%".join(files))
 		elif command == "setSong":
 			print("set song function")
 			isLoading = True
@@ -133,7 +131,7 @@ class MyHandler(BaseHTTPRequestHandler):
 			for currentItem in contentInDir:
 				if os.path.isdir(os.path.join(directory, currentItem)):
 					dirs.append(currentItem)
-			self.wfile.write("#".join(dirs))
+			self.wfile.write("#%".join(dirs))
 		elif command == "gotoParent":
 			# get current directory first
 			print("goto parent");

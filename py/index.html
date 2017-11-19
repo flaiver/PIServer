@@ -103,7 +103,7 @@
 			{
 				if (xhrSet.readyState == 4 && xhrSet.status == 200)
 				{
-					var metaData = xhrSet.responseText.split('#');
+					var metaData = xhrSet.responseText.split('#%');
 					self.__replaceElement(Row, metaData[0], "placeHolderTitle");
 					self.__replaceElement(Row, metaData[1], "placeHolderArtist");
 					var timeInMinutes = Math.floor(parseFloat(metaData[2])/60.0) + ":" + ('00' + (parseFloat(metaData[2]) % 60)).slice(-2); 
@@ -189,7 +189,7 @@
 			
 			if (xhrDirectory.readyState == 4 && xhrDirectory.status == 200) 
 			{
-				var directoryList = xhrDirectory.responseText.split('#');
+				var directoryList = xhrDirectory.responseText.split('#%');
 				directoryList.forEach(function(k, v) 
 				{
 					var row = self.__createDirectory(k);
@@ -257,7 +257,7 @@
 					if (response != "")
 					{
 						self.createSongHeader();
-						var songList = response.split('#');
+						var songList = response.split('#%');
 						songList.forEach(
 							function(k, v)
 							{
